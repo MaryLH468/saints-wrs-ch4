@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chapter 4 — Educational Pathways Explorer</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f0f5fb;
+  --surface: #ffffff;
+  --surface2: #eef2f8;
+  --border: rgba(0,0,0,0.10);
+  --border-strong: rgba(0,0,0,0.16);
+  --text: #1a1d23;
+  --text-secondary: #505868;
+  --text-hint: #94a0b4;
+  --blue: #2563eb;
+  --blue-light: #eff4ff;
+  --teal: #0f766e;
+  --teal-light: #e0f7f4;
+  --amber: #b45309;
+  --amber-light: #fef3c7;
+  --red: #b91c1c;
+  --red-light: #fee2e2;
+  --green: #15803d;
+  --green-light: #dcfce7;
+  --purple: #7c3aed;
+  --purple-light: #f5f3ff;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.65;
+  min-height: 100vh;
+  padding: 28px 16px 80px;
+}
+
+.container { max-width: 680px; margin: 0 auto; }
+
+.college-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid var(--border-strong);
+}
+.college-logo {
+  width: 36px; height: 36px;
+  background: #4fa3d1;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.college-name { font-size: 14px; font-weight: 600; color: var(--text-secondary); }
+.chapter-badge {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--blue-light);
+  color: var(--blue);
+  padding: 4px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.04em;
+}
+
+.progress-track {
+  background: var(--border);
+  border-radius: 100px;
+  height: 5px;
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 5px;
+  border-radius: 100px;
+  background: var(--blue);
+  transition: width 0.4s ease;
+}
+
+.step-dots {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+.dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--border-strong);
+  transition: background 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.dot.done { background: var(--teal); }
+.dot.active { background: var(--blue); transform: scale(1.25); }
+.dot-label { font-size: 12px; color: var(--text-hint); margin-left: 6px; }
+
+.step { display: none; }
+.step.active { display: block; animation: fadeUp 0.25s ease; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.3;
+}
+.step-sub {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 22px;
+  line-height: 1.7;
+}
+
+.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+@media (max-width: 480px) { .info-grid { grid-template-columns: 1fr; } }
+
+.info-box {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+.info-box .lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-hint);
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+.info-box .val {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.pathway-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 22px; }
+@media (max-width: 480px) { .pathway-grid { grid-template-columns: 1fr; } }
+
+.pathway-tile {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 0.5px solid var(--border-strong);
+  padding: 14px 16px;
+}
+.pathway-tile .pt { font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.pathway-tile .pd { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+.cfq {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.cfq-q { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+.cfq-opt {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: var(--surface2);
+  border: 0.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-bottom: 7px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.cfq-opt:hover:not(:disabled) { background: #dde6f5; }
+.cfq-opt.correct { background: var(--green-light); border-color: var(--green); color: #14532d; font-weight: 500; }
+.cfq-opt.wrong   { background: var(--red-light);   border-color: var(--red);   color: #7f1d1d; }
+.cfq-fb { font-size: 13px; margin-top: 8px; padding: 8px 12px; border-radius: var(--radius-sm); }
+.cfq-fb.good { background: var(--green-light); color: #14532d; }
+.cfq-fb.oops { background: var(--amber-light); color: #78350f; }
+
+.q1-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+@media (max-width: 480px) { .q1-grid { grid-template-columns: 1fr; } }
+.q1-row { display: flex; align-items: center; gap: 10px; }
+.q1-num { font-size: 14px; font-weight: 600; color: var(--text-hint); width: 22px; flex-shrink: 0; }
+
+input[type="text"] {
+  flex: 1;
+  height: 38px;
+  font-size: 14px;
+  font-family: inherit;
+  padding: 0 12px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
+
+/* ── Explorer (Q2) ── */
+.how-to-box {
+  background: #fffbeb;
+  border: 0.5px solid #fbbf24;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 18px;
+}
+.how-to-box .how-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 10px;
+}
+.how-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.how-step:last-child { margin-bottom: 0; }
+.how-num {
+  background: var(--amber);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.explorer-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.explorer-card:hover { border-color: var(--blue); box-shadow: 0 2px 10px rgba(37,99,235,0.09); }
+.explorer-card.viewed { border: 2px solid var(--blue); background: var(--blue-light); }
+.explorer-card .ec-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.explorer-card.viewed .ec-title { color: var(--blue); }
+.tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 100px;
+  margin-right: 5px;
+  margin-bottom: 3px;
+  background: var(--teal-light);
+  color: var(--teal);
+  font-weight: 500;
+}
+
+.detail-panel {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  animation: fadeUp 0.2s ease;
+}
+.detail-title { font-size: 17px; font-weight: 600; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 480px) { .detail-grid { grid-template-columns: 1fr; } }
+
+.copy-hint-box {
+  background: var(--green-light);
+  border: 0.5px solid #86efac;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #14532d;
+  line-height: 1.7;
+}
+.copy-hint-box strong { font-weight: 600; }
+
+.viewed-count { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+.viewed-count strong { color: var(--blue); }
+
+/* ── Q3 Sentence builder ── */
+.example-box {
+  background: var(--purple-light);
+  border: 0.5px solid #c4b5fd;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 20px;
+}
+.example-box .ex-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--purple);
+  margin-bottom: 10px;
+}
+.example-box .ex-text {
+  font-size: 14px;
+  color: #3b0764;
+  line-height: 1.8;
+  font-style: italic;
+}
+.example-box .ex-note {
+  font-size: 12px;
+  color: var(--purple);
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.sentence-step {
+  background: var(--surface);
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 14px;
+  animation: fadeUp 0.2s ease;
+}
+.sentence-step .ss-num {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--blue);
+  margin-bottom: 6px;
+}
+.sentence-step .ss-prompt {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+.sentence-step .ss-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.ss-example {
+  background: var(--surface2);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+.ss-example span { color: var(--blue); font-style: normal; font-weight: 600; }
+
+textarea.ss-input {
+  width: 100%;
+  min-height: 80px;
+  font-size: 14px;
+  font-family: inherit;
+  padding: 10px 13px;
+  border: 0.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+  line-height: 1.7;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  margin-bottom: 10px;
+}
+textarea.ss-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.10); }
+
+.assembled-box {
+  background: var(--surface);
+  border: 2px solid var(--green);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 16px;
+  animation: fadeUp 0.3s ease;
+}
+.assembled-box .as-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--green);
+  margin-bottom: 10px;
+}
+.assembled-box .as-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.8;
+  white-space: pre-wrap;
+  margin-bottom: 14px;
+}
+
+.copy-steps-box {
+  background: var(--green-light);
+  border: 0.5px solid #86efac;
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 16px;
+}
+.copy-steps-box .cs-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--green);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+.copy-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 9px;
+  font-size: 14px;
+  color: #14532d;
+  line-height: 1.6;
+}
+.copy-step:last-child { margin-bottom: 0; }
+.copy-num {
+  background: var(--green);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.keyboard-key {
+  display: inline-block;
+  background: white;
+  border: 1px solid #86efac;
+  border-radius: 4px;
+  padding: 1px 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #14532d;
+  font-family: monospace;
+}
+
+/* Nav */
+.nav-row { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+
+button.btn {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  border: 0.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background 0.15s, transform 0.1s;
+  line-height: 1;
+}
+button.btn:hover { background: var(--surface2); }
+button.btn:active { transform: scale(0.98); }
+button.btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+button.btn.primary:hover { background: #1d4ed8; }
+button.btn.green { background: var(--green); color: #fff; border-color: var(--green); }
+button.btn.green:hover { background: #166534; }
+button.btn:disabled { opacity: 0.38; cursor: not-allowed; transform: none; }
+
+.hint { font-size: 13px; color: var(--text-hint); margin-top: 8px; line-height: 1.6; }
+
+.summary-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 20px; }
+.summary-table th { text-align: left; padding: 10px 12px; background: var(--surface2); font-weight: 600; color: var(--text-secondary); border-bottom: 0.5px solid var(--border-strong); }
+.summary-table td { padding: 10px 12px; border-bottom: 0.5px solid var(--border); vertical-align: top; }
+
+.done-banner {
+  background: var(--green-light);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.done-icon { font-size: 32px; flex-shrink: 0; margin-top: 2px; }
+.done-title { font-size: 20px; font-weight: 600; color: #14532d; margin-bottom: 4px; }
+.done-sub { font-size: 14px; color: #166534; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="college-header">
+    <div class="college-logo">S</div>
+    <div class="college-name">Saints College</div>
+    <div class="chapter-badge">WRS Unit 1 · Chapter 4</div>
+  </div>
+
+  <div class="progress-track"><div class="progress-fill" id="progressBar" style="width:14%"></div></div>
+  <div class="step-dots" id="stepDots"></div>
+
+  <!-- ── STEP 1: Welcome ── -->
+  <div class="step active" id="step-1">
+    <p class="step-title">Welcome to chapter 4 &#x1F44B;</p>
+    <p class="step-sub">In this chapter you will explore <strong>educational pathways</strong> — the different ways people can keep learning and build skills after school.<br><br>We will go one step at a time. There is no rush.</p>
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="lbl">In this chapter you will</div>
+        <div class="val">&#x2714;&nbsp; Name six educational pathways<br>&#x2714;&nbsp; Explore what four of them involve<br>&#x2714;&nbsp; Reflect on which pathway suits your goals</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">How this works</div>
+        <div class="val">Each screen gives you one small task. Read it, then click <strong>Next</strong> when you are ready. You can always go <strong>Back</strong> to re-read anything.</div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn primary" onclick="go(2)">Let&rsquo;s start &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2: What is a pathway + CFU ── -->
+  <div class="step" id="step-2">
+    <p class="step-title">What is an educational pathway?</p>
+    <p class="step-sub">An educational pathway is the route you take to learn new skills and gain qualifications after school. There is no single right path — different pathways suit different people and different careers.</p>
+    <div class="info-grid">
+      <div class="info-box">
+        <div class="lbl">Formal pathways</div>
+        <div class="val">Lead to a recognised qualification — like a certificate, diploma, or degree. Employers and universities accept these.</div>
+      </div>
+      <div class="info-box">
+        <div class="lbl">Non-formal pathways</div>
+        <div class="val">Build skills without a formal qualification — like short courses, volunteering, or work experience.</div>
+      </div>
+    </div>
+    <div class="cfq" id="cfq1">
+      <div class="cfq-q">&#x1F9E0; Quick check — which of these is an example of a <em>formal</em> educational pathway?</div>
+      <button class="cfq-opt" onclick="checkQ('cfq1',this,true)">Completing a Certificate III at TAFE</button>
+      <button class="cfq-opt" onclick="checkQ('cfq1',this,false)">Watching YouTube tutorials to learn coding</button>
+      <button class="cfq-opt" onclick="checkQ('cfq1',this,false)">Helping out at a community event</button>
+      <div id="cfq1-fb"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="go(1)">&larr; Back</button>
+      <button class="btn primary" id="next2" onclick="go(3)" disabled>Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Six pathways overview ── -->
+  <div class="step" id="step-3">
+    <p class="step-title">Six educational pathways</p>
+    <p class="step-sub">Here are six common pathways in Australia. Read through each one carefully — you will use these to answer <strong>Question 1</strong> in your workbook.</p>
+    <div class="pathway-grid">
+      <div class="pathway-tile"><div class="pt">&#x1F6E0; Apprenticeship</div><div class="pd">Learn a trade while working and earning money. You study part-time at TAFE alongside your job. Common in construction, electrical, plumbing, and cooking.</div></div>
+      <div class="pathway-tile"><div class="pt">&#x1F4BC; Traineeship</div><div class="pd">Similar to an apprenticeship — work and study at the same time. Usually in service industries like retail, hospitality, or business administration.</div></div>
+      <div class="pathway-tile"><div class="pt">&#x1F3EB; TAFE / VET course</div><div class="pd">Study at a TAFE or training college. Earn a Certificate or Diploma in a practical area like health, IT, creative arts, or construction.</div></div>
+      <div class="pathway-tile"><div class="pt">&#x1F393; University degree</div><div class="pd">Study at a university for 3+ years to earn a bachelor degree. Suits careers like teaching, nursing, engineering, or law.</div></div>
+      <div class="pathway-tile"><div class="pt">&#x2705; Short course / Micro-credential</div><div class="pd">A focused course in one skill — often done online in hours to weeks. Examples: first aid, food safety, forklift licence, barista training.</div></div>
+      <div class="pathway-tile"><div class="pt">&#x2B50; VCE / VCE VM</div><div class="pd">Complete your senior secondary certificate. VCE VM (what you are doing now!) is the applied learning pathway, recognised by the VCAA.</div></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="go(2)">&larr; Back</button>
+      <button class="btn primary" onclick="go(4)">Next &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4: Q1 practice ── -->
+  <div class="step" id="step-4">
+    <p class="step-title">Question 1 — your turn</p>
+    <p class="step-sub">Open your workbook to <strong>Question 1</strong>. Practice typing the six pathways in the boxes below first, then write them in your workbook. You can click <strong>Back</strong> to look at the last screen if you need to.</p>
+    <div class="q1-grid">
+      <div class="q1-row"><span class="q1-num">1.</span><input type="text" placeholder="e.g. Apprenticeship"></div>
+      <div class="q1-row"><span class="q1-num">2.</span><input type="text"></div>
+      <div class="q1-row"><span class="q1-num">3.</span><input type="text"></div>
+      <div class="q1-row"><span class="q1-num">4.</span><input type="text"></div>
+      <div class="q1-row"><span class="q1-num">5.</span><input type="text"></div>
+      <div class="q1-row"><span class="q1-num">6.</span><input type="text"></div>
+    </div>
+    <p class="hint">&#x1F4A1; You don&rsquo;t have to spell perfectly — just give it a go. Your teacher is here to help.</p>
+    <div class="nav-row">
+      <button class="btn" onclick="go(3)">&larr; Back</button>
+      <button class="btn primary" onclick="go(5)">Next — explore pathways &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 5: Q2 pathway explorer ── -->
+  <div class="step" id="step-5">
+    <p class="step-title">Question 2 — explore four pathways</p>
+    <p class="step-sub">Click on a pathway card below to read about it. You need to explore <strong>four pathways</strong> in total. After reading each one, copy the information and paste it into the table in your workbook.</p>
+
+    <div class="how-to-box">
+      <div class="how-title">&#x1F4CB; How to use this screen</div>
+      <div class="how-step"><div class="how-num">1</div><div>Click a pathway card below to open it and read the information.</div></div>
+      <div class="how-step"><div class="how-num">2</div><div>To copy from the green boxes: <strong>click and drag your mouse</strong> over the text to highlight it, then press <strong>Ctrl+C</strong> (Windows) or <strong>Cmd+C</strong> (Mac) to copy.</div></div>
+      <div class="how-step"><div class="how-num">3</div><div>Go to your <strong>Canva workbook</strong>, click inside the correct cell in the table, then press <strong>Ctrl+V</strong> (Windows) or <strong>Cmd+V</strong> (Mac) to paste.</div></div>
+      <div class="how-step"><div class="how-num">4</div><div>Come back here and click another pathway card. Repeat until you have filled in <strong>four rows</strong> of your table.</div></div>
+    </div>
+
+    <div class="viewed-count">Pathways explored: <strong id="viewedNum">0</strong> of 4 needed</div>
+    <div id="explorerList"></div>
+    <div id="detailPanel"></div>
+    <div class="nav-row">
+      <button class="btn" onclick="go(4)">&larr; Back</button>
+      <button class="btn primary" onclick="go(6)">Next — Question 3 &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 6: Q3 — worked example first ── -->
+  <div class="step" id="step-6">
+    <p class="step-title">Question 3 — let&rsquo;s look at an example first</p>
+    <p class="step-sub">Before you write your own paragraph, read through this example. It shows you exactly what a good answer looks like. Notice how it names two pathways and gives a pro and a con for each.</p>
+
+    <div class="example-box">
+      <div class="ex-label">&#x1F4D6; Worked example</div>
+      <div class="ex-text">
+        I am interested in working in the <strong style="color:#7c3aed">early childhood education</strong> industry. Two pathways I could take are a <strong style="color:#7c3aed">TAFE Certificate III in Early Childhood Education</strong> and a <strong style="color:#7c3aed">University degree in Education</strong>.<br><br>
+        The TAFE pathway is practical and hands-on, which suits the way I like to learn. A pro is that I could finish in one to two years and start working sooner. A con is that some higher-level roles, like a director, may expect me to have a degree later on.<br><br>
+        The university pathway would give me deeper knowledge and open more doors in the long run. A pro is that it leads to more career options over time. A con is that it takes three to four years and involves a lot more reading and written assessments.
+      </div>
+      <div class="ex-note">&#x1F449; See how it: names the industry &rarr; names two pathways &rarr; gives a pro AND a con for each one.</div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn" onclick="go(5)">&larr; Back</button>
+      <button class="btn primary" onclick="go(7)">Now write my own &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 7: Q3 — sentence-by-sentence builder ── -->
+  <div class="step" id="step-7">
+    <p class="step-title">Question 3 — build your paragraph</p>
+    <p class="step-sub">We will build your paragraph one sentence at a time. Each step shows you exactly what to write. When you are done, your full paragraph will be ready to copy into your Canva workbook.</p>
+    <div id="sentenceBuilder"></div>
+    <div id="assembledSection" style="display:none"></div>
+    <div class="nav-row">
+      <button class="btn" onclick="go(6)">&larr; Back to example</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 8: Done ── -->
+  <div class="step" id="step-8">
+    <div class="done-banner">
+      <div class="done-icon">&#x1F389;</div>
+      <div>
+        <div class="done-title">You have completed chapter 4!</div>
+        <div class="done-sub">That was genuinely great work. You explored educational pathways and connected them to your own future goals.</div>
+      </div>
+    </div>
+    <table class="summary-table">
+      <thead><tr><th>Task</th><th>What you did</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Question 1</strong></td><td>Named six educational pathways</td></tr>
+        <tr><td><strong>Question 2</strong></td><td>Explored what four pathways involve and who they suit</td></tr>
+        <tr><td><strong>Question 3</strong></td><td>Wrote a paragraph about two pathways linked to your career interest</td></tr>
+      </tbody>
+    </table>
+    <div class="info-box">
+      <div class="lbl">Next step</div>
+      <div class="val">Submit your workbook by clicking the <strong>Submit to Canvas</strong> button in the top right corner of your workbook page. If you are not sure where that is, ask your teacher in Teams — they will help you.</div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" onclick="go(7)">&larr; Back</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const TOTAL = 8;
+const LABELS = ['Welcome','What is a pathway?','Six pathways','Q1: Name them','Q2: Explore four','Q3: Example','Q3: Write yours','All done!'];
+let current = 1;
+let viewed = new Set();
+
+/* ── Pathway data ── */
+const PATHWAYS = [
+  {
+    id: 'apprenticeship', name: 'Apprenticeship', emoji: '&#x1F6E0;',
+    tags: ['Trade','Hands-on','Paid','3&ndash;4 years'],
+    involves: 'You work with a qualified tradesperson while studying part-time at TAFE. Most apprenticeships take 3&ndash;4 years. You earn a wage the whole time you are training.',
+    suits: 'People who prefer hands-on learning over sitting in a classroom. Great if you enjoy working with tools, building things, or fixing things. Common trades: electrician, plumber, carpenter, chef.',
+    pros: 'Earn money while you learn. Gain real workplace experience from day one. Tradespeople are in high demand across Australia.',
+    cons: 'Can be physically demanding. Takes several years to complete. You must find an employer willing to take you on.'
+  },
+  {
+    id: 'traineeship', name: 'Traineeship', emoji: '&#x1F4BC;',
+    tags: ['Service industry','Paid','1&ndash;2 years','Nationally recognised'],
+    involves: 'Similar to an apprenticeship — you work and study at the same time. Usually in service or business roles. Traineeships typically take 1&ndash;2 years to complete.',
+    suits: 'People interested in retail, hospitality, business administration, community services, or childcare.',
+    pros: 'Earn while you learn. Shorter than most apprenticeships. Leads to a nationally recognised qualification.',
+    cons: 'Often entry-level wages. You need to juggle work and study at the same time.'
+  },
+  {
+    id: 'tafe', name: 'TAFE / VET course', emoji: '&#x1F3EB;',
+    tags: ['Flexible','Practical','Certificate or Diploma','Months&ndash;2 years'],
+    involves: 'Study at TAFE or a Registered Training Organisation (RTO). You can earn a Certificate (I&ndash;IV) or Diploma. Courses are practical and job-focused. You can study full-time, part-time, or online.',
+    suits: 'People who want practical skills in a specific area. Great for careers in health, IT, design, hospitality, early childhood, construction, or creative arts.',
+    pros: 'Flexible study options. Usually shorter and cheaper than university. Strong links to industry and employers.',
+    cons: 'May not lead directly to some professional careers that need a university degree, such as medicine or law.'
+  },
+  {
+    id: 'university', name: 'University degree', emoji: '&#x1F393;',
+    tags: ['Academic','3&ndash;4+ years','Bachelor degree','HECS-HELP available'],
+    involves: 'Study at a university for 3&ndash;4 years (sometimes longer) to earn a bachelor degree. You can study on campus or online. Costs are usually covered by a HECS-HELP loan — you pay it back once you earn above a set income.',
+    suits: 'People aiming for professional careers that require a degree — like nursing, teaching, engineering, social work, law, or psychology.',
+    pros: 'Opens doors to high-level professional roles. Develops deep knowledge in your field. Strong long-term earning potential in many careers.',
+    cons: 'Takes a long time (3+ years). More academic and theory-based than practical pathways. Can feel overwhelming without the right support.'
+  },
+  {
+    id: 'shortcourse', name: 'Short course / Micro-credential', emoji: '&#x2705;',
+    tags: ['Fast','Online option','Skill-specific','Hours&ndash;weeks'],
+    involves: 'A focused course on one specific skill. Often completed online in a few hours to a few weeks. Examples: first aid certificate, food handler certificate, forklift licence, digital marketing, barista training.',
+    suits: 'People who want to quickly add a specific skill to their resume. Great as an add-on alongside other pathways.',
+    pros: 'Fast to complete. Often affordable or free. Immediately useful when applying for jobs.',
+    cons: 'Does not lead to a full qualification on its own. Not always nationally recognised.'
+  },
+  {
+    id: 'vce', name: 'VCE / VCE VM', emoji: '&#x2B50;',
+    tags: ['Senior secondary','2 years','VCAA certificate','Applied learning'],
+    involves: 'Complete your senior secondary certificate across Year 11 and 12. VCE VM (Vocational Major) — the pathway you are on now — is an applied, practical learning program recognised by the VCAA.',
+    suits: 'Young people who learn by doing and want real-world connections in their study. Leads to further study, traineeships, apprenticeships, or direct employment.',
+    pros: 'Nationally recognised certificate. Builds strong life and work skills. Foundation for a wide range of further study or work options.',
+    cons: 'Requires two years of commitment. The VCE VM certificate is different to the standard VCE, which affects some direct university entry pathways.'
+  }
+];
+
+/* ── Sentence steps for Q3 ── */
+const SENTENCES = [
+  {
+    num: 'Sentence 1 of 5',
+    prompt: 'Name your industry and your two chosen pathways',
+    hint: 'Replace the words in [brackets] with your own ideas. Choose two different pathways from the ones you explored.',
+    example: '<span>I am interested in working in the [e.g. construction / hospitality / gaming / healthcare] industry. Two pathways I could take are [Pathway 1, e.g. an Apprenticeship] and [Pathway 2, e.g. a TAFE course].</span>',
+    placeholder: 'I am interested in working in the ... industry. Two pathways I could take are ... and ...'
+  },
+  {
+    num: 'Sentence 2 of 5',
+    prompt: 'Describe what your first pathway involves',
+    hint: 'In one or two sentences, say what this pathway actually is. You can look back at what you read in Question 2.',
+    example: '<span>The [Pathway 1] involves [what it involves — e.g. working and studying at the same time / studying at TAFE / completing a degree at university].</span>',
+    placeholder: 'The [pathway name] involves ...'
+  },
+  {
+    num: 'Sentence 3 of 5',
+    prompt: 'Give one pro AND one con of your first pathway',
+    hint: 'A PRO is something good about it. A CON is a downside or challenge. Try to be specific to your situation.',
+    example: '<span>A pro of this pathway is [something good — e.g. I would earn money while I learn]. A con is [a downside — e.g. it takes several years to complete].</span>',
+    placeholder: 'A pro of this pathway is ... A con is ...'
+  },
+  {
+    num: 'Sentence 4 of 5',
+    prompt: 'Describe what your second pathway involves',
+    hint: 'Now describe your second pathway. How is it different from the first one?',
+    example: '<span>The [Pathway 2] is different because it involves [what it involves — e.g. studying full-time at a university for three or more years].</span>',
+    placeholder: 'The [pathway name] is different because it involves ...'
+  },
+  {
+    num: 'Sentence 5 of 5',
+    prompt: 'Give one pro AND one con of your second pathway, then say which suits you best',
+    hint: 'Finish your paragraph by comparing the two options and saying which one you think suits you — and why.',
+    example: '<span>A pro of this pathway is [something good]. A con is [a downside]. After thinking about both pathways, I think [Pathway 1 or 2] would suit me best because [your reason — e.g. I prefer hands-on learning / I want to get into the workforce sooner].</span>',
+    placeholder: 'A pro of this pathway is ... A con is ... After thinking about both, I think ... would suit me best because ...'
+  }
+];
+
+let sentenceAnswers = ['','','','',''];
+let currentSentence = 0;
+let builderDone = false;
+
+/* ── Navigation ── */
+function renderDots() {
+  const el = document.getElementById('stepDots');
+  el.innerHTML = LABELS.map((_,i) => {
+    const n = i+1;
+    const cls = n < current ? 'done' : n === current ? 'active' : '';
+    return `<div class="dot ${cls}" title="${LABELS[i]}"></div>`;
+  }).join('') + `<span class="dot-label">${LABELS[current-1]}</span>`;
+}
+
+function renderProgress() {
+  document.getElementById('progressBar').style.width = Math.round((current/TOTAL)*100)+'%';
+}
+
+function go(n) {
+  document.getElementById('step-'+current).classList.remove('active');
+  current = n;
+  document.getElementById('step-'+current).classList.add('active');
+  renderDots();
+  renderProgress();
+  if (n === 5) renderExplorer();
+  if (n === 7) renderBuilder();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ── CFU ── */
+function checkQ(qid, btn, correct) {
+  const container = document.getElementById(qid);
+  container.querySelectorAll('.cfq-opt').forEach(b => { b.disabled = true; });
+  const fb = document.getElementById(qid+'-fb');
+  if (correct) {
+    btn.classList.add('correct');
+    fb.className = 'cfq-fb good';
+    fb.textContent = '✔ That\'s right! Well done.';
+    if (qid === 'cfq1') document.getElementById('next2').disabled = false;
+  } else {
+    btn.classList.add('wrong');
+    fb.className = 'cfq-fb oops';
+    fb.textContent = 'Not quite — look back at the definitions above, then try again.';
+    container.querySelectorAll('.cfq-opt').forEach(b => { b.disabled = false; });
+    btn.disabled = true;
+  }
+}
+
+/* ── Explorer (Q2) ── */
+function renderExplorer() {
+  const list = document.getElementById('explorerList');
+  list.innerHTML = PATHWAYS.map(p => `
+    <div class="explorer-card ${viewed.has(p.id) ? 'viewed' : ''}" onclick="showPathway('${p.id}')">
+      <div class="ec-title">${p.emoji} ${p.name}${viewed.has(p.id) ? ' <span style="font-size:12px;margin-left:4px;color:#15803d">&#x2714; explored</span>' : ''}</div>
+      <div>${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+  document.getElementById('viewedNum').textContent = viewed.size;
+}
+
+function showPathway(id) {
+  viewed.add(id);
+  const p = PATHWAYS.find(x => x.id === id);
+  const dp = document.getElementById('detailPanel');
+  dp.innerHTML = `
+    <div class="detail-panel">
+      <div class="detail-title">${p.emoji} ${p.name}</div>
+      <div class="detail-grid">
+        <div class="info-box"><div class="lbl">What it involves</div><div class="val">${p.involves}</div></div>
+        <div class="info-box"><div class="lbl">Who it suits</div><div class="val">${p.suits}</div></div>
+      </div>
+      <div class="detail-grid" style="margin-top:10px">
+        <div class="info-box"><div class="lbl">&#x2714; Pros</div><div class="val">${p.pros}</div></div>
+        <div class="info-box"><div class="lbl">&#x2718; Cons</div><div class="val">${p.cons}</div></div>
+      </div>
+      <div class="copy-hint-box">
+        <strong>&#x1F4CB; To copy this information into your workbook table:</strong><br>
+        1. Click and drag over the text you want to copy to <strong>highlight it</strong>.<br>
+        2. Press <strong>Ctrl+C</strong> (Windows) or <strong>Cmd+C</strong> (Mac) to copy.<br>
+        3. Open your <strong>Canva workbook</strong>, click inside the right cell in the table.<br>
+        4. Press <strong>Ctrl+V</strong> (Windows) or <strong>Cmd+V</strong> (Mac) to paste it in.<br>
+        5. Come back here and click another pathway card to keep going.
+      </div>
+    </div>`;
+  renderExplorer();
+  dp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+/* ── Sentence builder (Q3) ── */
+function renderBuilder() {
+  if (builderDone) {
+    showAssembled();
+    return;
+  }
+  const s = SENTENCES[currentSentence];
+  const el = document.getElementById('sentenceBuilder');
+  el.innerHTML = `
+    <div class="sentence-step">
+      <div class="ss-num">&#x270F;&#xFE0F; ${s.num}</div>
+      <div class="ss-prompt">${s.prompt}</div>
+      <div class="ss-hint">${s.hint}</div>
+      <div class="ss-example">Example: ${s.example}</div>
+      <textarea class="ss-input" id="ssInput" placeholder="${s.placeholder}">${sentenceAnswers[currentSentence]}</textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${currentSentence > 0 ? '<button class="btn" onclick="prevSentence()">&larr; Previous sentence</button>' : ''}
+        <button class="btn primary" onclick="nextSentence()">${currentSentence < SENTENCES.length - 1 ? 'Next sentence &rarr;' : 'Finish my paragraph &#x2714;'}</button>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div style="font-size:12px;color:var(--text-hint);margin-bottom:6px">Your paragraph so far:</div>
+      <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-secondary);line-height:1.8;min-height:40px;white-space:pre-wrap">${sentenceAnswers.filter(s=>s.trim()).join('\n\n') || '<em style="color:var(--text-hint)">Your sentences will appear here as you write them.</em>'}</div>
+    </div>`;
+}
+
+function nextSentence() {
+  const val = document.getElementById('ssInput').value.trim();
+  if (!val) {
+    const ta = document.getElementById('ssInput');
+    ta.style.borderColor = 'var(--red)';
+    ta.placeholder = 'Please write something here before moving on — even a rough idea is fine!';
+    ta.focus();
+    return;
+  }
+  sentenceAnswers[currentSentence] = val;
+  if (currentSentence < SENTENCES.length - 1) {
+    currentSentence++;
+    renderBuilder();
+    document.getElementById('sentenceBuilder').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } else {
+    builderDone = true;
+    showAssembled();
+  }
+}
+
+function prevSentence() {
+  const val = document.getElementById('ssInput');
+  if (val) sentenceAnswers[currentSentence] = val.value;
+  currentSentence--;
+  renderBuilder();
+}
+
+function showAssembled() {
+  const full = sentenceAnswers.filter(s => s.trim()).join('\n\n');
+  document.getElementById('sentenceBuilder').innerHTML = '';
+  const as = document.getElementById('assembledSection');
+  as.style.display = 'block';
+  as.innerHTML = `
+    <div class="assembled-box">
+      <div class="as-label">&#x1F7E2; Your paragraph — ready to copy!</div>
+      <div class="as-text" id="assembledText">${full}</div>
+    </div>
+    <div class="copy-steps-box">
+      <div class="cs-title">&#x1F4CB; How to copy this into your Canva workbook</div>
+      <div class="copy-step"><div class="copy-num">1</div><div>Click anywhere inside the green paragraph box above to place your cursor there.</div></div>
+      <div class="copy-step"><div class="copy-num">2</div><div>Press <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">A</span> (Windows) or <span class="keyboard-key">Cmd</span> + <span class="keyboard-key">A</span> (Mac) to <strong>select all</strong> the text.</div></div>
+      <div class="copy-step"><div class="copy-num">3</div><div>Press <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">C</span> (Windows) or <span class="keyboard-key">Cmd</span> + <span class="keyboard-key">C</span> (Mac) to <strong>copy</strong> it.</div></div>
+      <div class="copy-step"><div class="copy-num">4</div><div>Open your <strong>Canva workbook</strong>. Click inside the text box for Question 3.</div></div>
+      <div class="copy-step"><div class="copy-num">5</div><div>Press <span class="keyboard-key">Ctrl</span> + <span class="keyboard-key">V</span> (Windows) or <span class="keyboard-key">Cmd</span> + <span class="keyboard-key">V</span> (Mac) to <strong>paste</strong> your paragraph in.</div></div>
+      <div class="copy-step"><div class="copy-num">6</div><div>Read it back. If you want to change anything, you can edit it directly in Canva.</div></div>
+    </div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+      <button class="btn" onclick="editParagraph()">&#x270F;&#xFE0F; Edit my paragraph</button>
+      <button class="btn green" onclick="go(8)">I&rsquo;ve pasted it in — I&rsquo;m done! &rarr;</button>
+    </div>`;
+}
+
+function editParagraph() {
+  builderDone = false;
+  currentSentence = 0;
+  document.getElementById('assembledSection').style.display = 'none';
+  renderBuilder();
+}
+
+renderDots();
+renderProgress();
+</script>
+</body>
+</html>
